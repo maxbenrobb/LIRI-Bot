@@ -52,18 +52,21 @@ switch(input) {
     break;
   
   case 'do-what-it-says':
-    console.log("tbd")
+    spotifyCall()
+    userRequest = require('random.text')
     break;
 
   default:
-    console.log("Acceptable commands...")
+    console.log("Acceptable commands 'my-tweets,' 'spotify-this-song,' 'movie-this,' and 'do-what-it-says'")
     break;
 }
 function twitter() {
   var params = {screen_name: 'Max72585298'};
   client.get('statuses/user_timeline', params, function(error, tweets, response) {
     if (!error) {
-      console.log(tweets[0].text);
+      for (i = 0; i < 20; i++) { 
+        console.log(tweets[i].text);        
+      }
     }
   });
 }
@@ -86,7 +89,6 @@ function spotifyCall() {
 console.log("----------------------------------");
 
 function omdb() {
-  //title, year, IMDB rating, Rotten Tomatoes Rating, country produced in, language, plot, actors
   // Then run a request to the OMDB API with the movie specified
   var queryUrl = "http://www.omdbapi.com/?t=" + userRequest + "&apikey=trilogy";
 
@@ -109,4 +111,10 @@ function omdb() {
       console.log("Actors: " + string.Actors);
     }
   });
+}
+
+function doit() {
+  if (err) {
+    return console.log('Error occurred: ' + err);
+  }
 }
