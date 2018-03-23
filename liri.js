@@ -7,22 +7,24 @@ var Twitter = require('twitter');
 
 var request = require("request");
 var keys = require("./keys.js");
-//Why?
+
 var spotify = new Spotify(keys.spotify);
 var client = new Twitter(keys.twitter);
+
+//var random = require("./random.text")
 
 var input = process.argv[2];
 
 console.log("==================================");
 
-// Store all of the arguments in an array
+// // Store all of the arguments in an array
 var nodeArgs = process.argv;
 
-// Create an empty variable for holding the movie name
+// // Create an empty variable for holding the movie name
 var userRequest = "";
 
-// Loop through all the words in the node argument
-// And do a little for-loop magic to handle the inclusion of "+"s
+// // Loop through all the words in the node argument
+// // And do a little for-loop magic to handle the inclusion of "+"s
 for (var i = 3; i < nodeArgs.length; i++) {
 
   if (i > 3 && i < nodeArgs.length) {
@@ -38,28 +40,41 @@ for (var i = 3; i < nodeArgs.length; i++) {
   }
 }
 
-switch(input) {
-  case `my-tweets`:
-    twitter()
-    break;
-  
-  case `spotify-this-song`:
-    spotifyCall()
-    break;
-
-  case `movie-this`:
-    omdb()
-    break;
-  
-  case 'do-what-it-says':
-    spotifyCall()
-    userRequest = require('random.text')
-    break;
-
-  default:
-    console.log("Acceptable commands 'my-tweets,' 'spotify-this-song,' 'movie-this,' and 'do-what-it-says'")
-    break;
+if (input === 'do-what-it-says') {
+  fs.readFile("./random.text", function(err, f){
+    var data = f.toString();
+    var randomInput = data.substr(0, data.indexOf(','));
+    userRequest = data.substr(data.indexOf(',')+1);
+    handleInput(randomInput);
+  });
+} else {
+  handleInput(input);
 }
+
+function handleInput(input) {
+  switch(input) {
+    case `my-tweets`:
+      twitter()
+      break;
+    
+    case `spotify-this-song`:
+      spotifyCall(userRequest)
+      break;
+
+    case `movie-this`:
+      omdb()
+      break;
+    
+    // case 'do-what-it-says':
+    //   readRandom();
+    //   break;
+
+    default:
+      console.log("Acceptable commands 'my-tweets,' 'spotify-this-song,' 'movie-this,' and 'do-what-it-says'")
+      break;
+  }
+}
+
 function twitter() {
   var params = {screen_name: 'Max72585298'};
   client.get('statuses/user_timeline', params, function(error, tweets, response) {
@@ -73,17 +88,23 @@ function twitter() {
 
 console.log(input);
 
-function spotifyCall() {
-  spotify.search({ type: 'track', query: userRequest, limit: 1}, function(err, data) {
+function spotifyCall(request) {
+  //console.log(request)
+  spotify.search({ type: 'track', query: request, limit: 1}, function(err, data) {
     if (err) {
-      return console.log('Error occurred: ' + err);
+      console.log('Error occurred: ' + err);
+      return;
     }
-  
+    //console.log(data);
     console.log(data.tracks.items[0].album.artists[0].name);
     console.log(data.tracks.items[0].name);
     console.log(data.tracks.items[0].album.external_urls);
     console.log(data.tracks.items[0].album.name);
   });
+}
+
+function readRandom() {
+
 }
 
 console.log("----------------------------------");
@@ -99,7 +120,7 @@ function omdb() {
 
       // Parse the body of the site and recover just the imdbRating
       // (Note: The syntax below for parsing isn't obvious. Just spend a few moments dissecting it).
-      //console.log(JSON.parse(body));
+      console.log(JSON.parse(body));
       var string = JSON.parse(body)
       console.log("Title: " + string.Title);
       console.log("Year: " + string.Year);
